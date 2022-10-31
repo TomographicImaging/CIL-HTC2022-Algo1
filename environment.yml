@@ -1,4 +1,4 @@
-name: htc-22-cil-algo1
+name: htc-22-cil
 channels:
   - conda-forge
   - intel
