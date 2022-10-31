@@ -24,7 +24,6 @@ Installation instructions, including any requirements.
 ```
 conda env create --file environment.yml
 ```
-Python users: Please specify any modules used. If you use Anaconda, please add to the repository an environment.yml file capable of creating an environment than can run your code (instructions). Otherwise, please add a requirements.txt file generated with pip freeze (instructions)
 
 ## Usage instructions.
 Show few examples.
