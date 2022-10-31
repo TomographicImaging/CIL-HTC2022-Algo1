@@ -1,0 +1,13 @@
+name: htc-22-cil-algo1
+channels:
+  - conda-forge
+  - intel
+  - astra-toolbox
+  - ccpi
+dependencies:
+    - python
+    - numpy
+    - ccpi::cil =22.1.0
+    - astra-toolbox
+    - tigre=2.2
+    - scikit-image
