@@ -10,6 +10,9 @@ from cil.processors import MaskGenerator
 import matplotlib.pyplot as plt
 import skimage
 from skimage.filters import threshold_otsu, threshold_multiotsu
+from PIL import Image
+import numpy as np
+import os
 
 
 def load_htc2022data(filename, dataset_name='CtDataFull'):
@@ -242,8 +245,29 @@ def apply_global_threshold(data):
 
     return data_segmented
 
+
+def write_data_to_png(data, input_file, output_folder):
+    '''
+    Writes 'data' to a 24-bit PNG with the same name
+    as the 'input_file', in the 'output_folder'
+    '''
+    output_name = os.path.splitext(os.path.basename(input_file))[0]
+    output_path = os.path.join(output_folder, output_name) + '.png'
+    # We require a 24-bit PNG (RGB)
+    # Therefore we must convert to unit8 (8 bits per colour)
+    # And then convert to RGB:
+    data = data* 255
+    data = np.array(data, dtype=np.uint8)
+    data_rgb = Image.fromarray(data).convert("RGB")
+    data_rgb.save(output_path, 'png') #
+    # Note, to check we have the write format, in the command line (linux)
+    # type:
+    # `file <png name>`
+    # then you should see the output:
+    # `PNG image data, 512 x 512, 8-bit/color RGB`
+
+
 ############# Utils to create the circular mask #################
-import numpy as np
 import numba
 from skimage.filters import threshold_otsu
 from cil.recon import FDK
