@@ -1,31 +1,53 @@
+# basic imports
 from argparse import ArgumentParser
 import os
 import glob
+import numpy as np
+# method imports
 import util
-
-from cil.utilities.display import show2D
-from cil.recon import FDK
-
+from algo import pdhg_tv
 
 def preprocess(data):
-    # TODO: insert preprocessing code
-    return data
+    '''Preprocess the data'''
+    # renormalise data
+    data_renorm = util.correct_normalisation(data)
+    # pad data
+    data_pad = util.pad_zeros(data_renorm)
+    # apply beam hardening correction
+    data_BHC = util.apply_BHC(data_pad)
+    return data_BHC
 
-def segment(data):
-    # TODO: insert segmentation code
-    return data
+def segment(data, segment_type):
+    '''Run segmentation on data with method segment_type'''
+    if segment_type == 1:
+        ss = util.apply_global_threshold(data)
+    elif segment_type == 2:
+        ss = util.apply_crazy_threshold(data)
+    return util.flipud_unpack(ss)
+ 
+def create_lb_ub(data, ig, ub_mask_type, lb_mask_type, ub_val, lb_val, basic_mask_radius, lb_inner_radius):
+    # create default lower bound mask
+    lb = ig.allocate(lb_val)
+    # create upper bound mask
+    if ub_mask_type == 1:
+        ub = ig.allocate(ub_val)
+        ub = util.apply_circular_mask(ub, basic_mask_radius)
+    elif ub_mask_type == 2:
+        # sample mask with upper bound to acrylic attenuation
+        ub = ig.allocate(0)
+        circle_parameters = util.find_circle_parameters(data, ig)
+        util.fill_circular_mask(circle_parameters, ub.array, \
+            ub_val, *ub.shape)
+        # create lower bound mask annulus if needed
+        if lb_mask_type == 1:
+            inner_circle_parameters = circle_parameters.copy()
+            inner_circle_parameters[0] = lb_inner_radius
+            util.fill_circular_mask(circle_parameters, lb.array, ub_val, *ub.shape)
+            inner = ig.allocate(0.0)
+            util.fill_circular_mask(inner_circle_parameters, inner.array, 1.0, *ub.shape)
+            lb.array[inner.array.astype(bool)==1.0] = 0.0
 
-# TODO: delete this method:
-def run_algo(data):
-    # TO BE REPLACED BY THE ALGO
-    ig = data.geometry.get_ImageGeometry()
-    ig.voxel_num_x = 512
-    ig.voxel_num_y = 512
-    fdkfull = FDK(data, ig)
-    fdkfull.set_fft_order(13)
-    fdkreconfull = fdkfull.run(verbose=0)
-    fdkreconfull =util.flipud_unpack(util.apply_global_threshold(fdkreconfull))
-    return fdkreconfull
+    return lb, ub
 
 
 def main():
@@ -42,6 +64,34 @@ def main():
 
     print("Input folder: ", input_folder, " Output folder: ",  output_folder, " Difficulty: ", difficulty)
 
+    ###########################################################
+    # CONFIGURATION
+    # Image size
+    im_size = 512
+
+    # Upper bound mask
+    ub_val = 0.040859 # acrylic_attenuation in unit 1/mm
+    ub_mask_type = 2   # 1 basic 0.97 circle. 2 fitted
+    basic_mask_radius = 0.97
+
+    # Lower bound mask
+    lb_mask_type = 0   # 0:  lower bound 0 everywhere, 1: outer annulus equal to upper bound acrylic
+    lb_inner_radius = 200
+    lb_val = 0.0
+
+    # Reconstruction
+    num_iters = 2000
+    # with this algo we do not change alpha with difficulty level
+    alpha = 0.01
+    update_objective_interval = 100
+    verbose = 1
+    
+    # Segmentation
+    segmentation_method = 2  # 1 basic thresholding, 2 crazy
+
+    #####################################################
+
+
     input_files = glob.glob(os.path.join(glob.escape(input_folder),"*.mat"))
     if input_files == []:
         raise Exception(f"No input files found, looking in folder '{input_folder}' for files with extension '.mat'")
@@ -49,21 +99,40 @@ def main():
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
 
+
+    # MAIN FOR LOOP TO PROCESS EACH FILE IN THE INPUT DIRECTORY
     for input_file in input_files:
         # Load the data:
         data = util.load_htc2022data(input_file, dataset_name="CtDataLimited")
-
+        # Preprocess
         data_preprocessed = preprocess(data)
-        # TODO: call the algorithm, instead of run_algo
-        data_recon = run_algo(data_preprocessed)
-        data_segmented = segment(data_recon)
+        # discover angular range
+        ang_range = np.abs(data_preprocessed.geometry.angles[-1]-data_preprocessed.geometry.angles[0])
+        omega = 90.0/ang_range
+
+        ig = data_preprocessed.geometry.get_ImageGeometry()
+        ig.voxel_num_x = im_size
+        ig.voxel_num_y = im_size
+
+        # NOTE: the fit of the sample mask works best with the non pre-processed data
+        # as the FDK reconstruction is more blurry!!!
+        lb, ub = create_lb_ub(data, ig, ub_mask_type, lb_mask_type, 
+                                ub_val, lb_val, basic_mask_radius, lb_inner_radius)
+        
+        
+        # algorithmic parameters
+        args = [omega, alpha]
+        
+        # Run reconstruction
+        data_recon = pdhg_tv(data_preprocessed, ig, lb, ub, *args, num_iters=num_iters, 
+                update_objective_interval=update_objective_interval, verbose=verbose)
+        
+        data_segmented = segment(data_recon, segmentation_method)
 
         util.write_data_to_png(data_segmented, input_file, output_folder)
 
-        
-
-        
-
+    return 0
 
 if __name__ == '__main__':
-    main()
+    ret = main()
+    exit(ret)

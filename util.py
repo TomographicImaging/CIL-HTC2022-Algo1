@@ -443,7 +443,8 @@ def find_circle_parameters(data, ig):
         smaller_circle[0] -= delta
         fill_circular_mask(smaller_circle, mask.array, value, *mask.shape)
     
-    return np.asarray([r, x0, y0])
+    return fitted_circle
+
    
 def apply_crazy_threshold(data):
     data_segmented = data.copy()
