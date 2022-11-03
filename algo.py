@@ -1,4 +1,4 @@
-#   Copyright 2022 Science Technology Facilities Council
+#   Copyright 2022 United Kingdom Research and Innovation
 #   Copyright 2022 Technical University of Denmark
 #   Copyright 2022 Finden   
 #
