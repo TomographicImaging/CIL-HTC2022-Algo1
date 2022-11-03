@@ -27,7 +27,7 @@ def segment(data, segment_type):
  
 def create_lb_ub(data, ig, ub_mask_type, lb_mask_type, ub_val, lb_val, basic_mask_radius, lb_inner_radius):
     # create default lower bound mask
-    lb = ig.allocate(lb_val)
+    lb = ig.allocate(0.0)
     # create upper bound mask
     if ub_mask_type == 1:
         ub = ig.allocate(ub_val)
@@ -42,7 +42,7 @@ def create_lb_ub(data, ig, ub_mask_type, lb_mask_type, ub_val, lb_val, basic_mas
         if lb_mask_type == 1:
             inner_circle_parameters = circle_parameters.copy()
             inner_circle_parameters[0] = lb_inner_radius
-            util.fill_circular_mask(circle_parameters, lb.array, ub_val, *ub.shape)
+            util.fill_circular_mask(circle_parameters, lb.array, lb_val, *ub.shape)
             inner = ig.allocate(0.0)
             util.fill_circular_mask(inner_circle_parameters, inner.array, 1.0, *ub.shape)
             lb.array[inner.array.astype(bool)==1.0] = 0.0
@@ -77,7 +77,7 @@ def main():
     # Lower bound mask
     lb_mask_type = 0   # 0:  lower bound 0 everywhere, 1: outer annulus equal to upper bound acrylic
     lb_inner_radius = 200
-    lb_val = 0.0
+    lb_val = ub_val  # could be changed to 0.04 or other smaller values
 
     # Reconstruction
     num_iters = 2000
