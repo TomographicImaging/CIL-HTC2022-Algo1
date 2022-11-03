@@ -53,7 +53,7 @@ conda env create --file environment.yml
 Show few examples.
 
 ```
-conda activate env-name
+conda activate htc-22-cil-l2tv
 python main.py path/to/input/files path/to/output/files 3
 ```
 
