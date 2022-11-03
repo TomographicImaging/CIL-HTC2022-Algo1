@@ -54,7 +54,7 @@ def main():
     '''
     Example of use:
 
-    python main_full.py data pdhg2 1 -alpha=0.01 -ang_range=60 -ang_start=0 -ub_mask_type=2 -lb_mask_type=0 -ub_val=0.040859 -lb_val=0.040859 -num_iters=2000 -seg_method=2
+    python main_full.py <input folder> <output folder> <difficulty> -alpha=0.01 -ang_range=60 -ang_start=0 -ub_mask_type=2 -lb_mask_type=0 -ub_val=0.040859 -lb_val=0.040859 -num_iters=2000 -seg_method=2
 
     This example uses all of the same parameters as main.py [except ang_start and range aren't set there, but by the data]. This was used to test that we get the same result by
     running this script with the htc_2022_ta_full.mat file, as we do with running main.py with the htc_2022_ta_sparse_example.mat, by checking the scores are equal.
@@ -87,8 +87,6 @@ def main():
     if input_files == []:
         raise Exception(f"No input files found, looking in folder '{input_folder}' for files with extension '.mat'")
 
-
-    print("Input folder: ", input_folder, " Output folder: ",  output_folder, " Difficulty: ", difficulty)
 
     ###########################################################
     # CONFIGURATION
@@ -132,8 +130,6 @@ def main():
 
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
-
-
 
     # MAIN FOR LOOP TO PROCESS EACH FILE IN THE INPUT DIRECTORY
     for input_file in input_files:
