@@ -51,38 +51,44 @@ def create_lb_ub(data, ig, ub_mask_type, lb_mask_type, ub_val, lb_val, basic_mas
 
 
 def main():
-    '''Example of use:
-    python main_full.py data pdhg2 1 -alpha=0.01 -ang_range=90 -ang_start=0 -omega=3
+    '''
+    Example of use:
+
+    python main_full.py data pdhg2 1 -alpha=0.01 -ang_range=60 -ang_start=0 -ub_mask_type=2 -lb_mask_type=0 -ub_val=0.040859 -lb_val=0.040859 -num_iters=2000 -seg_method=2
+
+    This example uses all of the same parameters as main.py [except ang_start and range aren't set there, but by the data]. This was used to test that we get the same result by
+    running this script with the htc_2022_ta_full.mat file, as we do with running main.py with the htc_2022_ta_sparse_example.mat, by checking the scores are equal.
+    
+    Note, in the above example, omega was not set as an input, so it fell back to the default of 90/ang_range, but omega can be set using -omega=
     '''
     parser = ArgumentParser(description= 'CIL Team Algorithm 1')
     parser.add_argument('in_folder', help='Input folder, containing FULL data')
     parser.add_argument('out_folder', help='Output folder, where PNGs will be written')
     parser.add_argument('difficulty', type=int)
     parser.add_argument('-omega', type=float, help="Omega. If not set, defaults to 90/ang_range")
-    parser.add_argument('-alpha', type=float, help= "Alpha. This is required.")
-    parser.add_argument('-ang_start', type=int, help="Starting angle, degrees. This is required.")
-    parser.add_argument('-ang_range', type=int, help="Angular range, degrees. This is required.")
+    parser.add_argument('-alpha', type=float, required=True, help= "Alpha. This is required.")
+    parser.add_argument('-ang_start', type=int, required=True, help="Starting angle, degrees. This is required.")
+    parser.add_argument('-ang_range', type=int, required=True, help="Angular range, degrees. This is required.")
+    parser.add_argument('-ub_mask_type', type=int, required=True, choices=[1, 2],  help= "1 basic 0.97 circle. 2 fitted")
+    parser.add_argument('-lb_mask_type', type=int, required=True, choices=[0, 1],  help= "0:  lower bound 0 everywhere, 1: outer annulus equal to upper bound acrylic")
+    parser.add_argument('-ub_val', type=float, required=True, help= "Upper bound value, acrylic_attenuation in unit 1/mm")
+    parser.add_argument('-lb_val', type=float, required=True, help= "Lower bound value, could be changed to 0.04 or other smaller values")
+    parser.add_argument('-num_iters', type=int, required=True, help="Number of iterations.")
+    parser.add_argument('-seg_method', type=int, choices=[1, 2], required=True, help="1: basic thresholding, 2: crazy")
+
 
     args = parser.parse_args()
 
     input_folder = os.path.abspath(args.in_folder)
     output_folder = os.path.abspath(args.out_folder)
     difficulty = int(args.difficulty)
-    alpha = args.alpha
-    if alpha is None:
-        raise Exception("-alpha must be set!")
-    ang_range = args.ang_range
-    if ang_range is None:
-        raise Exception("-ang_range must be set!")
-    ang_start = args.ang_start
-    if ang_start is None:
-        raise Exception("-ang_start must be set!")
-    omega = args.omega
-    if omega is None:
-        omega = 90.0/ang_range
+
+    input_files = glob.glob(os.path.join(glob.escape(input_folder),"*.mat"))
+    if input_files == []:
+        raise Exception(f"No input files found, looking in folder '{input_folder}' for files with extension '.mat'")
+
 
     print("Input folder: ", input_folder, " Output folder: ",  output_folder, " Difficulty: ", difficulty)
-    print("Omega: ", omega, "Alpha: ", alpha, "Ang Start: ", ang_start, "Ang Range: ", ang_range)
 
     ###########################################################
     # CONFIGURATION
@@ -90,33 +96,43 @@ def main():
     im_size = 512
 
     # Upper bound mask
-    ub_val = 0.040859 # acrylic_attenuation in unit 1/mm
-    ub_mask_type = 2   # 1 basic 0.97 circle. 2 fitted
+    ub_val = args.ub_val # acrylic_attenuation in unit 1/mm
+    ub_mask_type = args.ub_mask_type   # 1 basic 0.97 circle. 2 fitted
     basic_mask_radius = 0.97
 
+
     # Lower bound mask
-    lb_mask_type = 0   # 0:  lower bound 0 everywhere, 1: outer annulus equal to upper bound acrylic
+    lb_mask_type = args.lb_mask_type  # 0:  lower bound 0 everywhere, 1: outer annulus equal to upper bound acrylic
     lb_inner_radius = 200
-    lb_val = ub_val  # could be changed to 0.04 or other smaller values
+    lb_val = args.lb_val  # could be changed to 0.04 or other smaller values
 
     # Reconstruction
-    num_iters = 2000
+    num_iters = args.num_iters
     # with this algo we do not change alpha with difficulty level
+    alpha = args.alpha
     update_objective_interval = 100
     verbose = 1
     
     # Segmentation
-    segmentation_method = 2  # 1 basic thresholding, 2 crazy
+    segmentation_method = args.seg_method  # 1 basic thresholding, 2 crazy
+
+    ang_range = args.ang_range
+    ang_start = args.ang_start
+    omega = args.omega
+    if omega is None:
+        omega = 90.0/ang_range
 
     #####################################################
 
+    print("Omega: ", omega, "Alpha: ", alpha, "Ang Start: ", ang_start, "Ang Range: ", ang_range)
+    print("Num iterations: ", num_iters, "Segmentation Method: ", segmentation_method)
+    print("Lower Bound Mask Type: ", lb_mask_type, "Lower Bound Value: ", lb_val)
+    print("Upper Bound Mask Type: ", ub_mask_type, "Upper Bound Value: ", ub_val)
 
-    input_files = glob.glob(os.path.join(glob.escape(input_folder),"*.mat"))
-    if input_files == []:
-        raise Exception(f"No input files found, looking in folder '{input_folder}' for files with extension '.mat'")
 
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
+
 
 
     # MAIN FOR LOOP TO PROCESS EACH FILE IN THE INPUT DIRECTORY
@@ -152,6 +168,9 @@ def main():
         util.write_data_to_png(data_segmented, input_file, output_folder)
 
     print("Omega: ", omega, "Alpha: ", alpha, "Ang Start: ", ang_start, "Ang Range: ", ang_range)
+    print("Num iterations: ", num_iters, "Segmentation Method: ", segmentation_method)
+    print("Lower Bound Mask Type: ", lb_mask_type, "Lower Bound Value: ", lb_val)
+    print("Upper Bound Mask Type: ", ub_mask_type, "Upper Bound Value: ", ub_val)
 
     return 0
 
