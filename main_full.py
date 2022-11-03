@@ -51,6 +51,9 @@ def create_lb_ub(data, ig, ub_mask_type, lb_mask_type, ub_val, lb_val, basic_mas
 
 
 def main():
+    '''Example of use:
+    python main_full.py data pdhg2 1 -alpha=0.01 -ang_range=90 -ang_start=0 -omega=3
+    '''
     parser = ArgumentParser(description= 'CIL Team Algorithm 1')
     parser.add_argument('in_folder', help='Input folder, containing FULL data')
     parser.add_argument('out_folder', help='Output folder, where PNGs will be written')
@@ -121,8 +124,7 @@ def main():
         # Load the data:
         datafull = util.load_htc2022data(input_file, dataset_name="CtDataFull")
         data = util.generate_reduced_data(datafull, ang_start, ang_range)
-        print(datafull)
-        print(data)
+
         # Preprocess
         data_preprocessed = preprocess(data)
         # discover angular range
