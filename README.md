@@ -7,7 +7,30 @@
 - Evangelos Papoutsellis (STFC, Finden), United Kingdom
 - Edoardo Pasca (STFC), United Kingdom
 
-Brief description of your algorithm and a mention of the competition.
+## Addresses
+STFC: 
+United Kingdom Research and Innovation
+Scientific Computing Department of Science Technology Facilities Council
+Rutherford Appleton Laboratory
+Harwell Campus
+Didcot
+OX11 0QX
+
+DTU: 
+Technical University of Denmark,
+Department of Applied Mathematics and Computer Science
+Richard Petersens Plads 
+Building 324
+2800 Kgs. Lyngby
+Denmark
+
+Finden: 
+Building R71,
+Rutherford Appleton Laboratory,
+Harwell,
+Oxford,
+OX11 0QX
+
 ## Description of the algorithm
 
 This is an entry for the [HTC2022 competition](https://www.fips.fi/HTC2022.php).
@@ -45,3 +68,6 @@ python main.py path/to/input/files path/to/output/files 3
 - test_data
   - htc2022_ta_full_recon_fbp_seg.png
   - htc2022_ta_sparse_example.mat
+
+## License
+All files in the repository come with the [Apache-v2.0](https://www.apache.org/licenses/LICENSE-2.0) license unless differently specified.
