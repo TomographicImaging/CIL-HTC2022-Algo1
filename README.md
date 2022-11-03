@@ -18,9 +18,9 @@ OX11 0QX
 DTU: 
 Technical University of Denmark,
 Department of Applied Mathematics and Computer Science
-Building 303B, office 001
-Matematiktorvet
-2800 Lyngby
+Richard Petersens Plads 
+Building 324
+2800 Kgs. Lyngby
 Denmark
 
 Finden: 
