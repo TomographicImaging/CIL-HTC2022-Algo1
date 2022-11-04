@@ -103,11 +103,6 @@ Scores for each sample and angle:
     - htc2022_tb_full.png
     - htc2022_tc_full.png
     - htc2022_td_full.png 
-  - AR360
-    - htc2022_ta_full.png 
-    - htc2022_tb_full.png
-    - htc2022_tc_full.png
-    - htc2022_td_full.png 
 
 
 ## License
