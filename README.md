@@ -62,6 +62,16 @@ This is an example of reconstructing the `htc_2022_ta_sparse_example.mat` exampl
 
 Left, is the given segmented result of performing FBP on the full dataset, right is our result of running our `main.py` with the file mentioned above:
 
+
+
+|  Sample/ Angles 	|  30 	|  60 	| 90 	| FBP 	|
+|----------	|-----	|---	|---	|---	|
+|   **ta**	|   	|   	|   	|   ![](https://github.com/TomographicImaging/CIL-HTC2022-Algo1/blob/main/test_data/htc2022_ta_full_recon_fbp_seg.png)	|
+|   **tb**	|   	|   	|   	|  ![](https://github.com/TomographicImaging/CIL-HTC2022-Algo1/blob/update_table/test_data/htc2022_tb_full_recon_fbp_seg.png) 	|
+|   **tc**	|   	|   	|   	|   ![](https://github.com/TomographicImaging/CIL-HTC2022-Algo1/blob/update_table/test_data/htc2022_tc_full_recon_fbp_seg.png)	|
+|   **td**	|   	|   	|   	|  ![](https://github.com/TomographicImaging/CIL-HTC2022-Algo1/blob/main/update_table/htc2022_td_full_recon_fbp_seg.png) 	|
+
+
 FBP on Full Dataset        |  Result of CIL-Algo1 - Score: 0.95337
 :-------------------------:|:-------------------------:
 ![](https://github.com/TomographicImaging/CIL-HTC2022-Algo1/blob/main/test_data/htc2022_ta_full_recon_fbp_seg.png)   |  ![](https://github.com/TomographicImaging/CIL-HTC2022-Algo1/blob/main/results/htc2022_ta_sparse_example.png)
