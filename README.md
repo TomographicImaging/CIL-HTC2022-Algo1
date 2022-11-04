@@ -35,7 +35,7 @@ OX11 0QX
 
 This is an entry for the [HTC2022 competition](https://www.fips.fi/HTC2022.php).
 The algorithm in `algo.py` is developed using [CIL](https://www.ccpi.ac.uk/cil), a toolkit for tomographic imaging and optimisation.
-The main steps of the algorithms are:
+The main steps of the algorithm is:
 1. Pre-processing: renormalisation, single material beam hardening correction, zero padding
 2. Generation of pixelwise lower and upper bound circular masks (mask is fitted to the provided data)
 3. Regularised iterative reconstruction algorithm using tools from CIL: Least-squares data fidelity with TV regularisation
