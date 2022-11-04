@@ -62,7 +62,7 @@ This is an example of reconstructing the `htc_2022_ta_sparse_example.mat` exampl
 
 Left, is the given segmented result of performing FBP on the full dataset, right is our result of running our `main.py` with the file mentioned above:
 
-FBP on Full Dataset        |  Result of CIL-Algo1
+FBP on Full Dataset        |  Result of CIL-Algo1 - Score: 0.95337
 :-------------------------:|:-------------------------:
 ![](https://github.com/TomographicImaging/CIL-HTC2022-Algo1/blob/main/test_data/htc2022_ta_full_recon_fbp_seg.png)   |  ![](https://github.com/TomographicImaging/CIL-HTC2022-Algo1/blob/show_examples/results/htc2022_ta_sparse_example.png)
 
